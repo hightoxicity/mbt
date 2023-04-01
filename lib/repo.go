@@ -181,6 +181,9 @@ func (r *libgitRepo) Changes(c Commit) ([]*DiffDelta, error) {
 	}
 
 	p := commit.Parent(0)
+	if p == nil {
+		p = commit
+	}
 	r.Log.Debug("Changes are based on parent %v", p)
 
 	t2, err := p.Tree()

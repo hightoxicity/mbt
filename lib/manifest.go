@@ -16,6 +16,7 @@ limitations under the License.
 package lib
 
 import (
+	"runtime"
 	"strings"
 
 	"github.com/mbtproject/mbt/utils"
@@ -26,11 +27,13 @@ func (s *stdSystem) ManifestByDiff(from, to string) (*Manifest, error) {
 	if err != nil {
 		return nil, err
 	}
+	runtime.KeepAlive(f)
 
 	t, err := s.Repo.GetCommit(to)
 	if err != nil {
 		return nil, err
 	}
+	runtime.KeepAlive(t)
 
 	return s.MB.ByDiff(f, t)
 }
@@ -44,6 +47,7 @@ func (s *stdSystem) ManifestByCommit(sha string) (*Manifest, error) {
 	if err != nil {
 		return nil, err
 	}
+	runtime.KeepAlive(c)
 	return s.MB.ByCommit(c)
 }
 
@@ -52,6 +56,7 @@ func (s *stdSystem) ManifestByCommitContent(sha string) (*Manifest, error) {
 	if err != nil {
 		return nil, err
 	}
+	runtime.KeepAlive(c)
 	return s.MB.ByCommitContent(c)
 }
 

@@ -17,6 +17,7 @@ package lib
 
 import (
 	"fmt"
+	"runtime"
 
 	git "github.com/libgit2/git2go/v34"
 	"github.com/mbtproject/mbt/e"
@@ -85,6 +86,8 @@ func (c *libgitCommit) Tree() (*git.Tree, error) {
 		c.tree = tree
 	}
 
+	runtime.KeepAlive(c)
+
 	return c.tree, nil
 }
 
@@ -113,6 +116,8 @@ func (r *libgitRepo) GetCommit(commitSha string) (Commit, error) {
 		return nil, e.Wrapf(ErrClassUser, err, msgCommitShaNotFound, commitSha)
 	}
 
+	runtime.KeepAlive(commit)
+
 	return &libgitCommit{commit: commit}, nil
 }
 
@@ -125,6 +130,9 @@ func (r *libgitRepo) Diff(a, b Commit) ([]*DiffDelta, error) {
 	if err != nil {
 		return nil, e.Wrap(ErrClassInternal, err)
 	}
+
+	runtime.KeepAlive(a)
+	runtime.KeepAlive(b)
 
 	return deltas(diff)
 }
@@ -139,6 +147,9 @@ func (r *libgitRepo) DiffMergeBase(from, to Commit) ([]*DiffDelta, error) {
 	if err != nil {
 		return nil, e.Wrap(ErrClassInternal, err)
 	}
+
+	runtime.KeepAlive(from)
+	runtime.KeepAlive(to)
 
 	return deltas(diff)
 }
@@ -181,9 +192,6 @@ func (r *libgitRepo) Changes(c Commit) ([]*DiffDelta, error) {
 	}
 
 	p := commit.Parent(0)
-	if p == nil {
-		p = commit
-	}
 	r.Log.Debug("Changes are based on parent %v", p)
 
 	t2, err := p.Tree()
@@ -195,6 +203,8 @@ func (r *libgitRepo) Changes(c Commit) ([]*DiffDelta, error) {
 	if err != nil {
 		return nil, e.Wrap(ErrClassInternal, err)
 	}
+
+	runtime.KeepAlive(c)
 
 	return deltas(d)
 }
@@ -233,6 +243,8 @@ func (r *libgitRepo) WalkBlobs(commit Commit, callback BlobWalkCallback) error {
 		return e.Wrapf(ErrClassInternal, err, msgFailedTreeWalk, tree.Id())
 	}
 
+	runtime.KeepAlive(commit)
+
 	return nil
 }
 
@@ -255,6 +267,8 @@ func (r *libgitRepo) EntryID(commit Commit, path string) (string, error) {
 	if err != nil {
 		return "", e.Wrapf(ErrClassInternal, err, "error while fetching the tree entry for %s", path)
 	}
+
+	runtime.KeepAlive(commit)
 
 	return entry.Id.String(), nil
 }
@@ -391,6 +405,8 @@ func (r *libgitRepo) BlobContentsFromTree(commit Commit, path string) ([]byte, e
 		return nil, e.Wrap(ErrClassInternal, err)
 	}
 
+	runtime.KeepAlive(commit)
+
 	return blob.Contents(), nil
 }
 
@@ -440,6 +456,8 @@ func (r *libgitRepo) Checkout(commit Commit) (Reference, error) {
 		return reference, e.Wrap(ErrClassInternal, err)
 	}
 
+	runtime.KeepAlive(commit)
+
 	return reference, nil
 }
 
@@ -480,6 +498,9 @@ func (r *libgitRepo) MergeBase(a, b Commit) (Commit, error) {
 		return nil, e.Wrap(ErrClassInternal, err)
 	}
 
+	runtime.KeepAlive(a)
+	runtime.KeepAlive(b)
+
 	return r.GetCommit(bid.String())
 }
 
@@ -498,6 +519,9 @@ func diff(repo *git.Repository, ca, cb Commit) (*git.Diff, error) {
 	if err != nil {
 		return nil, e.Wrap(ErrClassInternal, err)
 	}
+
+	runtime.KeepAlive(ca)
+	runtime.KeepAlive(cb)
 
 	return diff, nil
 }

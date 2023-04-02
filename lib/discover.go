@@ -21,6 +21,7 @@ import (
 	"io"
 	"io/ioutil"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	yaml "github.com/go-yaml/yaml"
@@ -103,6 +104,8 @@ func (d *stdDiscover) ModulesInCommit(commit Commit) (Modules, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	runtime.KeepAlive(commit)
 
 	return toModules(metadataSet)
 }

@@ -17,6 +17,7 @@ package lib
 
 import (
 	"path/filepath"
+	"runtime"
 )
 
 // NewManifestBuilder creates a new ManifestBuilder
@@ -55,6 +56,9 @@ func (b *stdManifestBuilder) ByDiff(from, to Commit) (*Manifest, error) {
 			return nil, err
 		}
 
+		runtime.KeepAlive(from)
+		runtime.KeepAlive(to)
+
 		return b.buildManifest(mods, to.ID())
 	})
 }
@@ -81,7 +85,7 @@ func (b *stdManifestBuilder) ByCommit(sha Commit) (*Manifest, error) {
 		if err != nil {
 			return nil, err
 		}
-
+		runtime.KeepAlive(sha)
 		return b.buildManifest(mods, sha.ID())
 	})
 }
@@ -109,6 +113,7 @@ func (b *stdManifestBuilder) ByCommitContent(sha Commit) (*Manifest, error) {
 				return nil, err
 			}
 		}
+		runtime.KeepAlive(sha)
 
 		return b.buildManifest(mods, sha.ID())
 	})
@@ -120,6 +125,8 @@ func (b *stdManifestBuilder) ByBranch(name string) (*Manifest, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		runtime.KeepAlive(c)
 
 		return b.ByCommit(c)
 	})

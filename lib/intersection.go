@@ -15,6 +15,10 @@ limitations under the License.
 
 package lib
 
+import (
+	"runtime"
+)
+
 func (s *stdSystem) IntersectionByCommit(first, second string) (Modules, error) {
 	c1, err := s.Repo.GetCommit(first)
 	if err != nil {
@@ -25,6 +29,9 @@ func (s *stdSystem) IntersectionByCommit(first, second string) (Modules, error) 
 	if err != nil {
 		return nil, err
 	}
+
+	runtime.KeepAlive(c1)
+	runtime.KeepAlive(c2)
 
 	return s.intersectionCore(c1, c2)
 }
@@ -39,6 +46,9 @@ func (s *stdSystem) IntersectionByBranch(first, second string) (Modules, error) 
 	if err != nil {
 		return nil, err
 	}
+
+	runtime.KeepAlive(fc)
+	runtime.KeepAlive(sc)
 
 	return s.intersectionCore(fc, sc)
 }
@@ -113,6 +123,9 @@ func (s *stdSystem) intersectionCore(first, second Commit) (Modules, error) {
 		result[i] = v
 		i++
 	}
+
+	runtime.KeepAlive(first)
+	runtime.KeepAlive(second)
 
 	return result, nil
 }

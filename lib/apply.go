@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"sort"
 	"strings"
 	"text/template"
@@ -78,6 +79,9 @@ func (s *stdSystem) ApplyBranch(templatePath, branch string, output io.Writer) e
 	if err != nil {
 		return err
 	}
+
+	runtime.KeepAlive(commit)
+
 	return s.applyCore(commit, templatePath, output)
 }
 
@@ -86,6 +90,9 @@ func (s *stdSystem) ApplyCommit(commit string, templatePath string, output io.Wr
 	if err != nil {
 		return err
 	}
+
+	runtime.KeepAlive(c)
+
 	return s.applyCore(c, templatePath, output)
 }
 
@@ -129,6 +136,8 @@ func (s *stdSystem) applyCore(commit Commit, templatePath string, output io.Writ
 	if err != nil {
 		return err
 	}
+
+	runtime.KeepAlive(commit)
 
 	return processTemplate(b, m, output)
 }

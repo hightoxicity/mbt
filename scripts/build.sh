@@ -37,7 +37,10 @@ go get github.com/mattn/goveralls
 
 # Set environment so to static link libgit2 when building git2go
 export PKG_CONFIG_PATH="$GIT2GO_PATH/static-build/build:$LIBGIT2_PATH/build"
+export CGO_CFLAGS="-I$HOME/static/openssl/include -I$HOME/static/libssh2/include"
 export CGO_LDFLAGS="$(pkg-config --libs --static $GIT2GO_PATH/static-build/build/libgit2.pc)"
+export CGO_ENABLED=1
+
 
 # All preparation is done at this point.
 # Move on to building mbt
@@ -73,7 +76,7 @@ if [ ! -z $COVERALLS_TOKEN ] && [ -f ./coverage.out ]; then
   $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
 fi
 
-go build -tags static,system_libgit2 -o "build/${OUT}"
+go build -tags static,system_libgit2 -ldflags '-extldflags "-static"' -o "build/${OUT}"
 shasum -a 1 -U "build/${OUT}" | cut -d ' ' -f 1 > "build/${OUT}.sha1"
 
 # Run go vet (this should happen after the build)
